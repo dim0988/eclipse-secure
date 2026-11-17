@@ -16,11 +16,12 @@ jobs:
           java-version: '17'
 
       - name: Build Debug APK
-        run: gradle assembleDebug
+        run: |
+          gradle wrapper --gradle-version 8.7
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v5
         with:
           name: app-debug
           path: "**/build/outputs/apk/debug/*.apk"
-          
