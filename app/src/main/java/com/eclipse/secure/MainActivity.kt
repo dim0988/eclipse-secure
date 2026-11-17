@@ -1,5 +1,6 @@
 package com.eclipse.secure
 
+import android.app.Activity
 import android.net.VpnService
 import android.os.Bundle
 import android.widget.Toast
@@ -73,15 +74,17 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
         scope.launch {
             isConnecting = true
             try {
-                withContext(Dispatchers.IO) {
-                    if (isConnected) {
+                if (isConnected) {
+                    withContext(Dispatchers.IO) {
                         backend.setState(tunnel, Tunnel.State.DOWN, null)
-                        isConnected = false
-                    } else {
-                        val config = ServerRepository.buildWireGuardConfig(selectedServer)
-                        backend.setState(tunnel, Tunnel.State.UP, config)
-                        isConnected = true
                     }
+                    isConnected = false
+                } else {
+                    val config = ServerRepository.buildWireGuardConfig(selectedServer)
+                    withContext(Dispatchers.IO) {
+                        backend.setState(tunnel, Tunnel.State.UP, config)
+                    }
+                    isConnected = true
                 }
             } catch (e: Exception) {
                 isConnected = false
@@ -95,7 +98,7 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
     val vpnPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == ComponentActivity.RESULT_OK) {
+        if (result.resultCode == Activity.RESULT_OK) {
             toggleTunnel()
         } else {
             Toast.makeText(context, "Разрешение VPN отклонено", Toast.LENGTH_SHORT).show()
