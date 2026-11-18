@@ -30,11 +30,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.wireguard.android.backend.GoBackend
-import com.wireguard.android.backend.Tunnel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.amnezia.awg.backend.GoBackend
+import org.amnezia.awg.backend.Tunnel
 
 val BgDark = Color(0xFF0A0612)
 val CardDark = Color(0xFF140D24)
@@ -43,7 +43,7 @@ val NeonGlow = Color(0xFFC77DFF)
 val ConnectedGreen = Color(0xFF00F5D4)
 
 class EclipseTunnel : Tunnel {
-    override fun getName(): String = "eclipse_wg0"
+    override fun getName(): String = "eclipse_awg0"
     override fun onStateChange(newState: Tunnel.State) {}
 }
 
@@ -127,7 +127,7 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
             letterSpacing = 3.sp
         )
         Text(
-            text = "WIREGUARD ENCRYPTED TUNNEL",
+            text = "AMNEZIAWG OBFUSCATED TUNNEL",
             color = NeonGlow,
             fontSize = 11.sp,
             letterSpacing = 1.5.sp
