@@ -46,10 +46,9 @@ object ServerRepository {
             Address = ${node.clientAddress}
             DNS = 1.1.1.1, 8.8.8.8
             MTU = ${node.mtu}
-            ExcludedApplications = com.eclipse.secure
-            Jc = 5
-            Jmin = 50
-            Jmax = 1000
+            Jc = 4
+            Jmin = 40
+            Jmax = 70
             S1 = 0
             S2 = 0
             H1 = 1
