@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.eclipse.secure"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.eclipse.secure"
@@ -26,7 +26,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
 
     compileOptions {
@@ -56,4 +56,3 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
 }
-
