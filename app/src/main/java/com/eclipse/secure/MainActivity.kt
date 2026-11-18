@@ -33,9 +33,8 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.amnezia.awg.backend.GoBackend
-import org.amnezia.awg.backend.Tunnel
-
+import com.wireguard.android.backend.GoBackend
+import com.wireguard.android.backend.Tunnel
 val BgDark = Color(0xFF0A0612)
 val CardDark = Color(0xFF140D24)
 val NeonPurple = Color(0xFF9D4EDD)
