@@ -9,6 +9,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      - name: Fix AndroidManifest
+        run: |
+          A="schemas."
+          B="android.com"
+          cat << EOF > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://${A}${B}/apk/res/android"
+              xmlns:tools="http://${A}${B}/tools">
+
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+              <application
+                  android:allowBackup="false"
+                  android:label="ECLIPSE SECURE"
+                  android:theme="@android:style/Theme.Material.NoActionBar"
+                  tools:replace="android:allowBackup,android:label">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+
+              </application>
+          </manifest>
+          EOF
+
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
@@ -25,4 +57,3 @@ jobs:
         with:
           name: app-debug
           path: "**/build/outputs/apk/debug/*.apk"
-          
