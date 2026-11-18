@@ -11,46 +11,31 @@ data class ServerNode(
     val endpoint: String,
     val publicKey: String,
     val privateKey: String,
-    val clientAddress: String
+    val clientAddress: String,
+    val mtu: Int = 1280
 )
 
 object ServerRepository {
     val servers = listOf(
         ServerNode(
-            id = "de",
-            country = "Germany",
-            flag = "🇩🇪",
-            endpoint = "185.220.101.1:51820",
-            publicKey = "xTIBA5rboUvnH4htodjb6e697QjLERt1NAB4mZqp8Dg=",
-            privateKey = "yAnz5TF+lXXJte14tji3zlMNq+hd2rYUIgJBgB3fBmk=",
-            clientAddress = "10.66.66.2/32"
+            id = "warp_main",
+            country = "Cloudflare WARP (Auto)",
+            flag = "⚡",
+            endpoint = "162.159.192.1:2408",
+            publicKey = "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+            privateKey = "+EZB5TIkusn0wC90jlQ/s+WqQ7XsGeMr02t14WFCgnw=",
+            clientAddress = "172.16.0.2/32, 2606:4700:110:8e8e:8fab:8405:be2a:5f0/128",
+            mtu = 1280
         ),
         ServerNode(
-            id = "us",
-            country = "USA",
-            flag = "🇺🇸",
-            endpoint = "198.51.100.10:51820",
-            publicKey = "xTIBA5rboUvnH4htodjb6e697QjLERt1NAB4mZqp8Dg=",
-            privateKey = "yAnz5TF+lXXJte14tji3zlMNq+hd2rYUIgJBgB3fBmk=",
-            clientAddress = "10.66.66.3/32"
-        ),
-        ServerNode(
-            id = "uk",
-            country = "UK",
-            flag = "🇬🇧",
-            endpoint = "203.0.113.25:51820",
-            publicKey = "xTIBA5rboUvnH4htodjb6e697QjLERt1NAB4mZqp8Dg=",
-            privateKey = "yAnz5TF+lXXJte14tji3zlMNq+hd2rYUIgJBgB3fBmk=",
-            clientAddress = "10.66.66.4/32"
-        ),
-        ServerNode(
-            id = "nl",
-            country = "Netherlands",
-            flag = "🇳🇱",
-            endpoint = "192.0.2.44:51820",
-            publicKey = "xTIBA5rboUvnH4htodjb6e697QjLERt1NAB4mZqp8Dg=",
-            privateKey = "yAnz5TF+lXXJte14tji3zlMNq+hd2rYUIgJBgB3fBmk=",
-            clientAddress = "10.66.66.5/32"
+            id = "warp_alt",
+            country = "Cloudflare WARP (Port 500)",
+            flag = "🛡️",
+            endpoint = "162.159.193.10:500",
+            publicKey = "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+            privateKey = "+EZB5TIkusn0wC90jlQ/s+WqQ7XsGeMr02t14WFCgnw=",
+            clientAddress = "172.16.0.2/32, 2606:4700:110:8e8e:8fab:8405:be2a:5f0/128",
+            mtu = 1280
         )
     )
 
@@ -59,7 +44,8 @@ object ServerRepository {
             [Interface]
             PrivateKey = ${node.privateKey}
             Address = ${node.clientAddress}
-            DNS = 1.1.1.1, 9.9.9.9
+            DNS = 1.1.1.1, 1.0.0.1
+            MTU = ${node.mtu}
 
             [Peer]
             PublicKey = ${node.publicKey}
