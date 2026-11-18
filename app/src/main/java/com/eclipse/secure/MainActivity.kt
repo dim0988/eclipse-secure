@@ -3,7 +3,6 @@ package com.eclipse.secure
 import android.app.Activity
 import android.net.VpnService
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -28,13 +27,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.wireguard.android.backend.BackendException
+import com.wireguard.android.backend.GoBackend
+import com.wireguard.android.backend.Tunnel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.wireguard.android.backend.GoBackend
-import com.wireguard.android.backend.Tunnel
+
 val BgDark = Color(0xFF0A0612)
 val CardDark = Color(0xFF140D24)
 val NeonPurple = Color(0xFF9D4EDD)
@@ -68,10 +70,12 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
     var selectedServer by remember { mutableStateOf(ServerRepository.servers.first()) }
     var isConnected by remember { mutableStateOf(false) }
     var isConnecting by remember { mutableStateOf(false) }
+    var errorText by remember { mutableStateOf<String?>(null) }
 
     fun toggleTunnel() {
         scope.launch {
             isConnecting = true
+            errorText = null
             try {
                 if (isConnected) {
                     withContext(Dispatchers.IO) {
@@ -85,9 +89,13 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
                     }
                     isConnected = true
                 }
-            } catch (e: Exception) {
+            } catch (e: BackendException) {
                 isConnected = false
-                Toast.makeText(context, "Ошибка туннеля: ${e.message}", Toast.LENGTH_LONG).show()
+                errorText = "BackendException: ${e.reason}"
+            } catch (e: Throwable) {
+                isConnected = false
+                val topFrame = e.stackTrace.firstOrNull()?.let { "${it.className.substringAfterLast('.')}:${it.lineNumber}" } ?: ""
+                errorText = "${e.javaClass.simpleName}: ${e.message ?: e.cause?.message ?: "no msg"} ($topFrame)"
             } finally {
                 isConnecting = false
             }
@@ -100,7 +108,7 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
         if (result.resultCode == Activity.RESULT_OK) {
             toggleTunnel()
         } else {
-            Toast.makeText(context, "Разрешение VPN отклонено", Toast.LENGTH_SHORT).show()
+            errorText = "Разрешение VPN отклонено системой"
         }
     }
 
@@ -187,6 +195,17 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
                 text = if (isConnected) "Protected • ${selectedServer.country}" else "Traffic Unprotected",
                 color = if (isConnected) ConnectedGreen else Color.Gray,
                 fontSize = 13.sp
+            )
+        }
+
+        if (errorText != null) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = errorText!!,
+                color = Color(0xFFFF6B6B),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
