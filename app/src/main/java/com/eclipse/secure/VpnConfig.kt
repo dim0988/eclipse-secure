@@ -1,6 +1,6 @@
 package com.eclipse.secure
 
-import org.amnezia.awg.config.Config
+import com.wireguard.config.Config
 import java.io.BufferedReader
 import java.io.StringReader
 
