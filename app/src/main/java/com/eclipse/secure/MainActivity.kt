@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wireguard.android.backend.BackendException
+import com.wireguard.android.backend.Config
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.android.backend.Tunnel
 import kotlinx.coroutines.Dispatchers
@@ -253,7 +254,8 @@ private fun toggleTunnel(
                 }
                 setConnected(false)
             } else {
-                val config = ServerRepository.buildWireGuardConfig(selectedServer)
+                val rawConfig = ServerRepository.buildWireGuardConfig(selectedServer)
+                val config = Config.parse(rawConfig.byteInputStream())
                 withContext(Dispatchers.IO) {
                     backend.setState(tunnel, Tunnel.State.UP, config)
                 }
@@ -271,4 +273,3 @@ private fun toggleTunnel(
         }
     }
 }
-
