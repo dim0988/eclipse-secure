@@ -72,41 +72,11 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
     var isConnecting by remember { mutableStateOf(false) }
     var errorText by remember { mutableStateOf<String?>(null) }
 
-    fun toggleTunnel() {
-        scope.launch {
-            isConnecting = true
-            errorText = null
-            try {
-                if (isConnected) {
-                    withContext(Dispatchers.IO) {
-                        backend.setState(tunnel, Tunnel.State.DOWN, null)
-                    }
-                    isConnected = false
-                } else {
-                    val config = ServerRepository.buildWireGuardConfig(selectedServer)
-                    withContext(Dispatchers.IO) {
-                        backend.setState(tunnel, Tunnel.State.UP, config)
-                    }
-                    isConnected = true
-                }
-            } catch (e: BackendException) {
-                isConnected = false
-                errorText = "BackendException: ${e.reason}"
-            } catch (e: Throwable) {
-                isConnected = false
-                val topFrame = e.stackTrace.firstOrNull()?.let { "${it.className.substringAfterLast('.')}:${it.lineNumber}" } ?: ""
-                errorText = "${e.javaClass.simpleName}: ${e.message ?: e.cause?.message ?: "no msg"} ($topFrame)"
-            } finally {
-                isConnecting = false
-            }
-        }
-    }
-
     val vpnPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            toggleTunnel()
+            toggleTunnel(scope, backend, tunnel, selectedServer, { isConnecting = it }, { isConnected = it }, { errorText = it }, { isConnected })
         } else {
             errorText = "Разрешение VPN отклонено системой"
         }
@@ -155,7 +125,7 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
                     if (intent != null && !isConnected) {
                         vpnPermissionLauncher.launch(intent)
                     } else {
-                        toggleTunnel()
+                        toggleTunnel(scope, backend, tunnel, selectedServer, { isConnecting = it }, { isConnected = it }, { errorText = it }, { isConnected })
                     }
                 }
         ) {
@@ -259,6 +229,45 @@ fun EclipseSecureScreen(backend: GoBackend, tunnel: EclipseTunnel) {
                     )
                 )
             }
+        }
+    }
+}
+
+private fun toggleTunnel(
+    scope: kotlinx.coroutines.CoroutineScope,
+    backend: GoBackend,
+    tunnel: EclipseTunnel,
+    selectedServer: ServerModel,
+    setConnecting: (Boolean) -> Unit,
+    setConnected: (Boolean) -> Unit,
+    setError: (String?) -> Unit,
+    getConnected: () -> Boolean
+) {
+    scope.launch {
+        setConnecting(true)
+        setError(null)
+        try {
+            if (getConnected()) {
+                withContext(Dispatchers.IO) {
+                    backend.setState(tunnel, Tunnel.State.DOWN, null)
+                }
+                setConnected(false)
+            } else {
+                val config = ServerRepository.buildWireGuardConfig(selectedServer)
+                withContext(Dispatchers.IO) {
+                    backend.setState(tunnel, Tunnel.State.UP, config)
+                }
+                setConnected(true)
+            }
+        } catch (e: BackendException) {
+            setConnected(false)
+            setError("BackendException: ${e.reason}")
+        } catch (e: Throwable) {
+            setConnected(false)
+            val topFrame = e.stackTrace.firstOrNull()?.let { "${it.className.substringAfterLast('.')}:${it.lineNumber}" } ?: ""
+            setError("${e.javaClass.simpleName}: ${e.message ?: e.cause?.message ?: "no msg"} ($topFrame)")
+        } finally {
+            setConnecting(false)
         }
     }
 }
