@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "eclipse-secure"
+rootProject.name = "Eclipse Secure"
 include(":app")
